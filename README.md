@@ -1,4 +1,4 @@
-# README for the Interpreter
+# README
 
 ## General Information
 
