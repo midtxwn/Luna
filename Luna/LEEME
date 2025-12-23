@@ -1,0 +1,82 @@
+README para el Intérprete
+
+Información General
+
+    Este intérprete, inspirado en la sintaxis de Lua, permite ejecutar expresiones matemáticas, funciones y comandos. 
+    Soporta múltiples statements por línea separados por ";". 
+    Las funciones se llaman con "nombreFuncion(param1, param2, ...)", mientras que los comandos usan la sintaxis "COMANDO \"parametro\"". 
+    Usa el comando "HELP" para ver todos los comandos disponibles.
+
+Requisitos y Compilación
+
+    - GCC: gcc (Ubuntu 9.4.0-1ubuntu1~20.04.2) 9.4.0
+    - Flex: 2.6.4
+    - Bison: (GNU Bison) 3.5.1
+    - Sistema Operativo: Ubuntu 20.04.2 LTS
+
+    Es necesario tener instalado "make". Si no lo tienes, instálalo con:
+        sudo apt-get install make
+	
+	El proyecto hace uso de un .h generado por bison, por lo que es un requisito NECESARIO compilar en bison con la opcion -d
+    	bison -d parser.y
+    En caso de modificar el nombre del fichero parser.y, es necesario modificar de manera correspondiente la inclusión del .h generado en los códigos fuente.
+    
+    Para compilar el archivo de flex, (flexfile.l), ejecuta:
+    	flex flexfile.l
+    	
+    El proyecto incluye un Makefile. Para compilar, ejecuta:
+        make
+    
+
+Funcionalidades Clave
+
+    - Sintaxis:
+        - Funciones: nombreFuncion(param1, param2, ...)
+        - Comandos: COMANDO "parametro"
+        -Expresiones
+			El intérprete soporta una variedad de expresiones matemáticas y operaciones, incluyendo:
+			
+			Números: Valores numéricos directos, por ejemplo, 3.14.
+			Variables: Identificadores que pueden almacenar valores numéricos. Se pueden asignar valores usando la sintaxis variable = expresión, por ejemplo, x = 5.
+			Constantes: Identificadores predefinidos con valores numéricos fijos que no pueden ser reasignados, por ejemplo, PI_0 y E_0.
+			Funciones: Llamadas a funciones predefinidas o importadas por el usuario con la sintaxis nombreFuncion(param1, param2, ...). Las funciones pueden tomar de 0 a 3 argumentos, por ejemplo, sin(0), max(3, 7).
+			Operaciones aritméticas:
+				Suma: exp + exp, por ejemplo, 2 + 3.
+				Resta: exp - exp, por ejemplo, 5 - 2.
+				Multiplicación: exp * exp, por ejemplo, 4 * 3.
+				División: exp / exp, por ejemplo, 10 / 2. (Nota: La división por cero genera un error.)
+				Negación unaria: -exp, por ejemplo, -5.
+				Exponenciación: exp ^ exp, por ejemplo, 2 ^ 3.
+				Agrupación: Uso de paréntesis para agrupar subexpresiones, por ejemplo, (2 + 3) * 4.
+				El intérprete también maneja errores como:
+			
+			División por cero.
+			Uso de variables no definidas.
+			Intento de asignación a constantes o funciones.
+			Además, puede importar funciones desde librerías externas si no están definidas localmente.(Véase comando IMPORT)
+        	
+
+    - Sistema de Parámetros:
+        - Se permiten funciones con 0 a 3 parámetros. 
+          Este límite es una característica de un prototipo de sistema de paso de número de argumentos variables, ya que generar punteros a funciones 
+          con más parámetros dinámicamente en C escapa al alcance de las librerías estándar. 
+          No se codifica como metadatos el número de argumentos para una función, por lo que el usuario debe asegurar una correcta llamada (número adecuado de parámetros) 
+          para evitar comportamientos indefinidos a la hora de llamar a funciones.
+
+    - Comando "HELP":
+        - Fundamental para explorar todos los comandos disponibles.
+
+    - Comando "IMPORT":
+        - Carga librerías dinámicas. Incluye una librería de prueba: "libtestfuncs.so" (compilada desde "testfuncs.c").
+        - Ejemplo: IMPORT "./libtestfuncs.so"
+
+    - Comando "LOAD":
+        - Ejecuta archivos de script. Incluye dos archivos de prueba: "testload1" y "testload2".
+        - Ejemplo: LOAD "./testload1"
+
+    - Gestión de Errores:
+        - Módulo centralizado con tres tipos de errores: comandos, sintácticos/semánticos y léxicos.
+
+    - Tabla de Símbolos:
+        - Usa un Árbol Binario de Búsqueda (ABB) como estructura interna, readaptado para la nueva arquitectura 
+          y con funcionalidad de eliminación añadida principalmente para el comando "CLEAR".
